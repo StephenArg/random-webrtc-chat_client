@@ -2,11 +2,18 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import { Provider } from 'react-redux';
+// eslint-disable-next-line
+import configureStore, {history} from './StoreManagers/store'
 import * as serviceWorker from './serviceWorker';
+
+const store = configureStore()
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App browserHistory={history} />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
