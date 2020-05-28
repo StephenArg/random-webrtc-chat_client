@@ -1,6 +1,7 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 
-export default function Settings(props) {
+function Settings(props) {
 
     const handleClick = () => {
         props.history.push('/')
@@ -13,3 +14,5 @@ export default function Settings(props) {
         </div>
     )
 }
+
+export default withRouter(Settings)

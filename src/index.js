@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import { Provider } from 'react-redux';
 // eslint-disable-next-line
-import configureStore, {history} from './StoreManagers/store'
+import configureStore, {history} from './storeManagers/store'
 import * as serviceWorker from './serviceWorker';
 
 const store = configureStore()

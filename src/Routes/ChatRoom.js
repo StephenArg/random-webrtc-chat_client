@@ -1,6 +1,7 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 
-export default function ChatRoom(props) {
+function ChatRoom(props) {
 
     const handleClick = () => {
         props.history.push('/settings')
@@ -13,3 +14,5 @@ export default function ChatRoom(props) {
         </div>
     )
 }
+
+export default withRouter(ChatRoom)

@@ -13,14 +13,18 @@
   }
 }
 
+#html-body {
+  margin-top: -22px
+}
+
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 15vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(12px + 2vmin);
   color: white;
 }
 
@@ -35,4 +39,16 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.homepage-container {
+  grid-template-columns: 40px 50px auto 50px 40px;
+  grid-template-rows: 25% 100px auto;
+}
+.homepage-menu {
+  grid-column-start: 2;
+  grid-column-end: five;
+  grid-row-start: row1-start;
+  grid-row-end: 3;
+  background-color: cadetblue
 }

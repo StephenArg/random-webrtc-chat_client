@@ -2,12 +2,13 @@ import {applyMiddleware, createStore} from 'redux'
 // import {combineReducers} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension'
 import {routerMiddleware} from 'react-router-redux'
-import {createHashHistory} from 'history'
+import {createBrowserHistory} from 'history'
 import createSagaMiddleware from 'redux-saga'
 import reducers from './reducers'
 // import {coreReducers} from './reducers'
 import {authRootSaga} from './AuthManager'
-const history = createHashHistory()
+// const history = createHashHistory()
+const history = createBrowserHistory()
 const routeMiddleware = routerMiddleware(history)
 const sagaMiddleware = createSagaMiddleware()
 
