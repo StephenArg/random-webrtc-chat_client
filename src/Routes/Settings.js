@@ -1,7 +1,12 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { withRouter } from 'react-router-dom'
+import authenticateUser from '../util/authenticateUser'
 
 function Settings(props) {
+
+    useEffect(() => {
+        authenticateUser(props.history)
+    }, [])
 
     const handleClick = () => {
         props.history.push('/')
