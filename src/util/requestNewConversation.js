@@ -8,6 +8,7 @@ const requestNewConversation = async (user) => {
         body: JSON.stringify(obj)
     })
     const data = await res.json()
+    console.log('conversationInfo', data)
     return data
 }
 

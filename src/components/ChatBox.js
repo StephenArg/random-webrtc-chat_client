@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 
-function ChatBox({user, myLocation}) {
+function ChatBox({user, myLocation, otherUsersInfo}) {
 
     const [formValue, setFormValue] = useState("")
 
@@ -18,8 +18,8 @@ function ChatBox({user, myLocation}) {
                     <ul className="chat-list">
                         <h5 className="location-messages"> Chat Messages</h5>
                         <h5 className="location-messages"> - {user.name} (You) - Location: {myLocation}</h5>
-                        {/* guestLocation */ true ?
-                        (<h5 className="location-messages"> - {"guestName"} (Joined) - Location: {"guestLocation"} </h5>)
+                        {otherUsersInfo.name !== 'N/A' && otherUsersInfo.location !== 'N/A' ?
+                        (<h5 className="location-messages"> - {otherUsersInfo.name} (Joined) - Location: {otherUsersInfo.location} </h5>)
                         : null}
                         {/* {allMessages} */}
                     </ul>
