@@ -1,16 +1,25 @@
 import React, {useState} from 'react'
+import { connect } from 'react-redux';
+import { addMessage, increaseMessageIdCounter } from '../storeManagers/MessagesManager'
 
-function ChatBox({user, myLocation, otherUsersInfo}) {
-
+function ChatBox(props) {
+    const {user, myLocation, otherUsersInfo, handleSubmitMessage, addMessage, messages, increaseMessageIdCounter, messageIdCounter} = props
     const [formValue, setFormValue] = useState("")
+    // const [messageIdCounter, setMessageIdCounter] = useState(0)
+    // const [chatMessages, setChatMessages] = useState([])
 
     const submitMessage = (e) => {
         e.preventDefault()
+        handleSubmitMessage(formValue)
+        addMessage({id: messageIdCounter, name: 'Me', content: formValue })
+        setFormValue("")
+        increaseMessageIdCounter()
     }
 
-    // let allMessages = this.state.chatMessages.map(message => {
-    //     return <li key={message.id} className="text-messages" ><small>{message.user_id}: {message.content}</small></li>
-    // })
+    const allMessages = messages.map(message => {
+        return <li key={message.id} className="text-messages" ><small>{message.name}: {message.content}</small></li>
+    })
+
 
     return (
         <div>
@@ -21,7 +30,7 @@ function ChatBox({user, myLocation, otherUsersInfo}) {
                         {otherUsersInfo.name !== 'N/A' && otherUsersInfo.location !== 'N/A' ?
                         (<h5 className="location-messages"> - {otherUsersInfo.name} (Joined) - Location: {otherUsersInfo.location} </h5>)
                         : null}
-                        {/* {allMessages} */}
+                        {allMessages}
                     </ul>
                 </div>
                 <form onSubmit={submitMessage}>
@@ -32,4 +41,17 @@ function ChatBox({user, myLocation, otherUsersInfo}) {
     )
 }
 
-export default ChatBox
+const mapStateToProps = function(state) {
+    const {Messages} = state
+    return {
+      messages: Messages.messages,
+      messageIdCounter: Messages.messageIdCounter
+    }
+  }
+
+  const mapDispatchToProps = {
+      addMessage: message => addMessage(message),
+      increaseMessageIdCounter: () => increaseMessageIdCounter()
+  }
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChatBox)

@@ -15,20 +15,22 @@ export const onMessage = (params, socketResponseTriggeredFunc, setSubscribedToCo
             case 'incoming_candidate':
                 socketResponseTriggeredFunc('incoming_candidate', messageObj)
                 break;
+            case 'reopen_conversation':
+                socketResponseTriggeredFunc('reopen_conversation')
+                break;
+            case 'incoming_message':
+                socketResponseTriggeredFunc('incoming_message', messageObj)
+                break;
             default:
                 if(JSON.parse(data.identifier).channel === 'ConversationChannel' && data.type === 'confirm_subscription') {
                     setSubscribedToConversationChannel(true)
                 }
         }
     }
-
-    // console.log("message", data)
-
-
 }
 
 export const onClose = (params) => {
-    console.log("close", params)
+    console.log("closed websocket")
 }
 
 export const onOpen = (params, setWebSocketEstablished) => {
@@ -41,8 +43,21 @@ export const subscribeToConversationChannel = (socket, conversationInfo, user) =
         command: 'subscribe',
         identifier: JSON.stringify({
             channel: 'ConversationChannel',
-            conversation_id: conversationInfo.conversation_id,
-            id: user.id,
+            conversation_id: conversationInfo?.conversation_id,
+            id: user?.id,
+        }),
+    };
+    socket.send(JSON.stringify(msg));
+}
+
+export const unsubscribeFromConversationChannel = (socket, conversationInfo, user) => {
+    console.log('unsubscribing to ConversationsChannel')
+    const msg = {
+        command: 'unsubscribe',
+        identifier: JSON.stringify({
+            channel: 'ConversationChannel',
+            conversation_id: conversationInfo?.conversation_id,
+            id: user?.id,
         }),
     };
     socket.send(JSON.stringify(msg));

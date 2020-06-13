@@ -6,6 +6,7 @@ import {signOut, requestLocationData} from './storeManagers/AuthManager'
 import HomePage from './routes/HomePage'
 import Settings from './routes/Settings'
 import ChatRoom from './routes/ChatRoom'
+// import ChatRoom from './routes/ChatRoomPCFunc'
 import Connections from './routes/Connections'
 // import data from './mockDB/what.json'
 
