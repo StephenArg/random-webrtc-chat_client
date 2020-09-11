@@ -4,12 +4,11 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux';
 import authenticateUser from '../util/authenticateUser'
 import requestNewConversation, {requestCredentials, reopenConversation} from '../util/requestNewConversation'
-import Socket from '../util/websocketClass'
+import {onMessage, onOpen, onClose, subscribeToConversationChannel, unsubscribeFromConversationChannel, sendCommandToConversationChannel} from '../util/websocketFunctions'
 import PeerConnection from '../util/peerConnectionClass'
 import ChatBox from '../components/ChatBox'
 import { receiveUser } from '../storeManagers/AuthManager';
 import { addMessage, increaseMessageIdCounter, resetMessages } from '../storeManagers/MessagesManager'
-import { updateScroll } from '../util/helperFunctions'
 // yarn added @tensorflow/tfjs
 // // const mobilenet = require('@tensorflow-models/mobilenet')
 // const cocoSsd = require('@tensorflow-models/coco-ssd')
@@ -29,20 +28,26 @@ function ChatRoom(props) {
     const [chatting, setChatting] = useState(false)
     const [conversationInfo, setConversationInfo] = useState(null)
     const [otherUsersInfo, setOtherUsersInfo] = useState({name: "N/A", location: "N/A"})
-    const [websocketEstablished, setWebSocketEstablished] = useState(false)
+    const [websocketEstablished, setWebsocketEstablished] = useState(false)
     const [subscribedToConversationChannel, setSubscribedToConversationChannel] = useState(false)
+    const [receivedOffer, setReceivedOffer] = useState(false)
+    const [receivedOfferWithNoUserOrConversation, setReceivedOfferWithNoUserOrConversation] = useState(null)
+    const [receivedNewMessage, setReceivedNewMessage] = useState(null)
+    const [mustReopenConversation, setMustReopenConversation] = useState(false)
     const [startOrStopChattingButtonEnabled, setStartOrStopChattingButtonEnabled] = useState(false)
-    const [videoOverlay, setVideoOverlay] = useState(false)
 
     useEffect(() => {
         if (!signedIn){
           authenticateUser(props.history).then((user) => receiveUser(user))
         }
         var intervalCode;
-        // var intervalModel;
+        var intervalModel;
         const asyncFuncWithinUseEffect = async () => {
             pcConfig['iceServers'] = await requestCredentials()
-            socket = new Socket(setSubscribedToConversationChannel, setOtherUsersInfo, setWebSocketEstablished, socketResponseTriggeredFunc)
+            socket = new WebSocket("ws://localhost:3000/cable")
+            socket.onmessage = (params) => onMessage(params, socketResponseTriggeredFunc, setSubscribedToConversationChannel, setOtherUsersInfo)
+            socket.onclose = onClose
+            socket.onopen = (params) => onOpen(params, setWebsocketEstablished)
             setStartOrStopChattingButtonEnabled(true)
 
             intervalCode = setInterval(async () => {
@@ -67,9 +72,9 @@ function ChatRoom(props) {
 
         return () => {
             clearInterval(intervalCode)
-            // clearInterval(intervalModel)
+            clearInterval(intervalModel)
             try{
-                socket.socket.close()
+                socket.close()
                 peerConnection.pc.close()
             } catch {
                 console.error('No socket or peerConnection')
@@ -103,8 +108,7 @@ function ChatRoom(props) {
     useEffect(() => {
         if (websocketEstablished && conversationInfo && user) {
             console.log('subscribeToConversationChannel useEffect')
-            socket.socketResponseTriggeredFunc = socketResponseTriggeredFunc
-            socket.subscribeToConversationChannel(conversationInfo, user)
+            subscribeToConversationChannel(socket, conversationInfo, user)
         }
     }, [websocketEstablished, conversationInfo])
 
@@ -128,15 +132,46 @@ function ChatRoom(props) {
     }, [subscribedToConversationChannel, myLocation, conversationInfo])
 
     useEffect(() => {
-        // Resets state closure values within socketResponseTriggeredFunc when they change in the outer scope
-        if(socket) {
-            socket.socketResponseTriggeredFunc = socketResponseTriggeredFunc
+        if (receivedOfferWithNoUserOrConversation && user && conversationInfo) {
+            peerConnection.createNewPeerConnection(intializeRemoteElementStream, peerConnectionResponseTriggeredFunc, receivedOfferWithNoUserOrConversation)
+            setReceivedOfferWithNoUserOrConversation(false)
+            setReceivedOffer(true)
         }
-    }, [messageIdCounter, otherUsersInfo])
+    }, [receivedOfferWithNoUserOrConversation, user, conversationInfo])
 
+    useEffect(() => {
+        if(receivedOffer && user && conversationInfo) {
+            const asyncFuncWithinUseEffect = async () => {
+                try {
+                    const answer = await peerConnection.generateAnswer()
+                    sendThroughWebsocket('answer_to_user', {answer: answer, otherUsersLocation: myLocation, otherUsersName: user.name})
+                } catch {
+                    console.error('Error making Answer')
+                }
+                setReceivedOffer(false)
+            }  
+            asyncFuncWithinUseEffect()
+        }
+    }, [receivedOffer, conversationInfo])
+
+    useEffect(() => {
+        if (receivedNewMessage) {
+            addMessage({id: messageIdCounter, name: otherUsersInfo.name, content: receivedNewMessage })
+            increaseMessageIdCounter()
+            setReceivedNewMessage(null)
+        }
+    }, [receivedNewMessage])
+
+    useEffect(() => {
+        if (mustReopenConversation && conversationInfo && user) {
+            console.log('reopening')
+            reopenConversation(conversationInfo.conversation_id, user.id)
+            setMustReopenConversation(false)
+        }
+    }, [mustReopenConversation, conversationInfo, user])
 
     const sendThroughWebsocket = (action, payload) => {
-        socket.sendCommandToConversationChannel(conversationInfo, user, action, payload)
+        sendCommandToConversationChannel(socket, conversationInfo, user, action, payload)
     }
 
     const intializeLocalElementStream = (myStream) => {
@@ -171,12 +206,12 @@ function ChatRoom(props) {
         console.log('within socketResponseTriggeredFunc', user, conversationInfo)
         switch (command) {
             case 'incoming_offer':
-                peerConnection.createNewPeerConnection(intializeRemoteElementStream, peerConnectionResponseTriggeredFunc, payload.offer)
-                try {
-                    const answer = await peerConnection.generateAnswer()
-                    sendThroughWebsocket('answer_to_user', {answer: answer, otherUsersLocation: myLocation, otherUsersName: user.name})
-                } catch {
-                    console.error('Error making Answer')
+                if (!user || !conversationInfo) {
+                    console.log('doing it')
+                    setReceivedOfferWithNoUserOrConversation(payload.offer)
+                } else {
+                    peerConnection.createNewPeerConnection(payload.offer)
+                    setReceivedOffer(true)
                 }
                 break;
             case 'incoming_answer':
@@ -191,26 +226,16 @@ function ChatRoom(props) {
                      ((peerConnection.pc.signalingState && peerConnection.pc.signalingState !== 'closed') ||
                       (peerConnection.pc.connectionState && peerConnection.pc.connectionState !== 'closed'))) {
                     console.log('incoming_candidate', peerConnection.pc, payload.candidate)
-                    try{
-                        peerConnection.pc.addIceCandidate(new RTCIceCandidate(payload.candidate))
-                    } catch(e) {
-                        console.error('Error with peerConnection', e)
-                    }
-
+                    peerConnection.pc.addIceCandidate(new RTCIceCandidate(payload.candidate))
                 }
                 break;
             case 'reopen_conversation':
                 resetAllVariables()
-                console.log('reopening')
-                reopenConversation(conversationInfo.conversation_id, user.id)
+                setMustReopenConversation(true)
                 break;
             case 'incoming_message':
                 console.log('message:', payload.message)
-                const d = new Date();
-                const time = d.toLocaleTimeString();
-                addMessage({id: messageIdCounter, name: otherUsersInfo.name, content: payload.message, time: time, otherUser: true })
-                increaseMessageIdCounter()
-                updateScroll()
+                setReceivedNewMessage(payload.message)
                 break;
             default:
                 console.log('No command')
@@ -221,7 +246,7 @@ function ChatRoom(props) {
         // console.log('peerConnectionResponseTriggeredFunc', conversationInfo)
         switch(command) {
             case 'send_candidate':
-                //This [was] breaking. Kept saying conversation info is null for the answerer (This note was before the switch to peerConnection class)
+                //This [was] breaking. Kept saying conversation info is null for the answerer
                 sendThroughWebsocket('candidate', payload)
                 break;
             case 'on_negotiation':
@@ -273,7 +298,7 @@ function ChatRoom(props) {
         if (startOrStopChattingButtonEnabled) {
             console.log('stopChatting')
             setStartOrStopChattingButtonEnabled(false)
-            if(socket.socket){socket.unsubscribeFromConversationChannel(conversationInfo, user)}
+            if(socket){unsubscribeFromConversationChannel(socket, conversationInfo, user)}
             if(peerConnection.pc){peerConnection.pc.close()}
             setConversationInfo(null)
             resetAllVariables()
@@ -309,28 +334,16 @@ function ChatRoom(props) {
     return (
         <div>
             <div className="chatroom-container">
-                <div className="video-frame" >
-                    <video id="myVideo"
-                        className={videoOverlay ? "myVideoOverlay videoFeed" : "videoFeed"}
-                        poster={process.env.PUBLIC_URL + 'loading.gif'}
-                        onClick={()=>setVideoOverlay(!videoOverlay)}
-                        autoPlay>
-                    </video>
+                <div className="video-frame">
+                    <video id="myVideo" poster={process.env.PUBLIC_URL + 'loading.gif'} autoPlay></video>
                     <br type="block"/>
-                    <video id="theirVideo"
-                        className={videoOverlay ? "theirVideoOverlay videoFeed" : "videoFeed"}
-                        poster={process.env.PUBLIC_URL + 'loading.gif'}
-                        onClick={()=>setVideoOverlay(!videoOverlay)}
-                        autoPlay>    
-                    </video>
+                    <video id="theirVideo" poster={process.env.PUBLIC_URL + 'loading.gif'} autoPlay></video>
                 </div>
 
                 <div className="chat-box">
-                    <ChatBox user={user} myLocation={myLocation} otherUsersInfo={otherUsersInfo}
-                        handleSubmitMessage={handleSubmitMessage} chatting={chatting}
-                        stopChatting={stopChatting} startChatting={startChatting}
-                        handleTest={handleTest} startOrStopChattingButtonEnabled={startOrStopChattingButtonEnabled} />
-                    <br type="block"/>
+                    <ChatBox user={user} myLocation={myLocation} otherUsersInfo={otherUsersInfo} handleSubmitMessage={handleSubmitMessage} />
+                    { chatting ? <button onClick={stopChatting} >Stop Chatting</button> : <button onClick={startChatting}>Start Chatting</button>}
+                    <button onClick={handleTest}>Test</button>
                 </div>
             </div>
             <button className="chatroom-home-button" onClick={handleRerouteHome}>Back to Home</button>
