@@ -7,7 +7,7 @@ import requestNewConversation, {requestCredentials} from '../util/requestNewConv
 import {onMessage, onOpen, onClose, subscribeToConversationChannel, unsubscribeFromConversationChannel, sendCommandToConversationChannel} from '../util/websocketFunctions'
 import {createNewPeerConnection, generateOffer, generateAnswer} from '../util/peerConnectionFunctions'
 import ChatBox from '../components/ChatBox'
-import { receiveUser } from '../storeManagers/AuthManager';
+import { receiveUser } from '../StoreManagers/AuthManager';
 
 var pcConfig = {
     'iceServers': [{"urls": "stun:stun.l.google.com:19302"},

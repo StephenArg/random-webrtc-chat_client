@@ -7,8 +7,8 @@ import requestNewConversation, {requestCredentials, reopenConversation} from '..
 import Socket from '../util/websocketClass'
 import PeerConnection from '../util/peerConnectionClass'
 import ChatBox from '../components/ChatBox'
-import { receiveUser } from '../storeManagers/AuthManager';
-import { addMessage, increaseMessageIdCounter, resetMessages } from '../storeManagers/MessagesManager'
+import { receiveUser } from '../StoreManagers/AuthManager';
+import { addMessage, increaseMessageIdCounter, resetMessages } from '../StoreManagers/MessagesManager'
 import { updateScroll } from '../util/helperFunctions'
 // yarn added @tensorflow/tfjs
 // // const mobilenet = require('@tensorflow-models/mobilenet')
@@ -41,13 +41,21 @@ function ChatRoom(props) {
         var intervalCode;
         // var intervalModel;
         const asyncFuncWithinUseEffect = async () => {
-            pcConfig['iceServers'] = await requestCredentials()
+            try{
+                pcConfig['iceServers'] = await requestCredentials()
+            } catch (error) {
+                console.error(error)
+            }
             socket = new Socket(setSubscribedToConversationChannel, setOtherUsersInfo, setWebSocketEstablished, socketResponseTriggeredFunc)
             setStartOrStopChattingButtonEnabled(true)
 
             intervalCode = setInterval(async () => {
                 if(peerConnection){
-                    peerConnection.pcConfig['iceServers'] = await requestCredentials()
+                    try {
+                        peerConnection.pcConfig['iceServers'] = await requestCredentials()
+                    } catch (error) {
+                        console.error(error)
+                    }
                 }
                 // interval currently at 60 seconds, ideally it should be 30 minutes.
             }, 60000)

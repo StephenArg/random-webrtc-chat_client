@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import UserAuth from '../containers/UserAuth'
 import MainMenu from '../containers/MainMenu'
 import {withRouter} from 'react-router-dom'
-import { receiveUser, signOut } from '../storeManagers/AuthManager';
+import { receiveUser, signOut } from '../StoreManagers/AuthManager';
 
 function HomePage(props) {
 

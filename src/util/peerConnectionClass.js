@@ -26,7 +26,9 @@ export default class PeerConnection {
     }
 
     generateOffer = async (renegotiation = false) => {
-        this.isPCClosed()
+        if (this.isPCClosed()){
+            return;
+        }
         try {
             const offer = await this.pc.createOffer()
             this.pc.setLocalDescription(offer)
@@ -37,7 +39,9 @@ export default class PeerConnection {
     }
 
     generateAnswer = async (renegotiation = false) => {
-        this.isPCClosed()
+        if (this.isPCClosed()){
+            return;
+        }
         try {
             const answer = await this.pc.createAnswer()
             this.pc.setLocalDescription(answer)
@@ -49,7 +53,9 @@ export default class PeerConnection {
     } 
 
     sendIceCandidate = (event) => {
-        this.isPCClosed()
+        if (this.isPCClosed()){
+            return;
+        }
         if (event.candidate) {
             // console.log(event.candidate)
             this.peerConnectionResponseTriggeredFunc('send_candidate', {candidate: event.candidate})
@@ -72,7 +78,9 @@ export default class PeerConnection {
             ((this.pc.signalingState && this.pc.signalingState !== 'closed') ||
              (this.pc.connectionState && this.pc.connectionState !== 'closed')))) {
                  this.history.push('/')
+                 return true
              }
+        return false
     }
 
 }

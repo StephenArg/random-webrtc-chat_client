@@ -30,7 +30,7 @@ export const requestCredentials = async () => {
     if (data.credentials){
         return data.credentials
     } else {
-        console.error('no ice candidates')
+        throw new Error('no ice candidates. possible server issue')
     }
 }
 

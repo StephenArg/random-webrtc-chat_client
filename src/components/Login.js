@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import { connect } from 'react-redux';
-import {receiveUser} from '../storeManagers/AuthManager'
+import {receiveUser} from '../StoreManagers/AuthManager'
 
 function Login(props) {
     

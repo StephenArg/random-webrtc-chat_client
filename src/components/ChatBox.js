@@ -1,6 +1,6 @@
 import React, {useState, Fragment} from 'react'
 import { connect } from 'react-redux';
-import { addMessage, increaseMessageIdCounter } from '../storeManagers/MessagesManager'
+import { addMessage, increaseMessageIdCounter } from '../StoreManagers/MessagesManager'
 import {updateScroll} from '../util/helperFunctions'
 
 function ChatBox(props) {
@@ -51,7 +51,7 @@ function ChatBox(props) {
             <div className="chat-list">
                 <div className="location-messages"> Chat Messages</div>
                 <div className="location-messages"> - {user.name} (You) - Location: {myLocation}</div>
-                {otherUsersInfo.name !== 'N/A' && otherUsersInfo.location !== 'N/A' ?
+                {otherUsersInfo.name !== 'N/A' ?
                 (<Fragment>
                     <div className="location-messages"> - {otherUsersInfo.name} (Joined) - Location: {otherUsersInfo.location} </div>
                     <hr className="chat-box-hr" />

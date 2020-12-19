@@ -2,13 +2,13 @@ import React, {useEffect} from 'react';
 import './App.css';
 import { connect } from 'react-redux';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
-import {signOut, requestLocationData} from './storeManagers/AuthManager'
-import HomePage from './routes/HomePage'
-import Settings from './routes/Settings'
-import ChatRoom from './routes/ChatRoom'
-// import ChatRoom from './routes/ChatRoomSocketFunc'
-// import ChatRoom from './routes/ChatRoomPCFunc'
-import Connections from './routes/Connections'
+import {signOut, requestLocationData} from './StoreManagers/AuthManager'
+import HomePage from './Routes/HomePage'
+import Settings from './Routes/Settings'
+import ChatRoom from './Routes/ChatRoom'
+// import ChatRoom from './Routes/ChatRoomSocketFunc'
+// import ChatRoom from './Routes/ChatRoomPCFunc'
+import Connections from './Routes/Connections'
 // import data from './mockDB/what.json'
 
 function App(props) {

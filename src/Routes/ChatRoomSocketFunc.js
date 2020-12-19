@@ -7,8 +7,8 @@ import requestNewConversation, {requestCredentials, reopenConversation} from '..
 import {onMessage, onOpen, onClose, subscribeToConversationChannel, unsubscribeFromConversationChannel, sendCommandToConversationChannel} from '../util/websocketFunctions'
 import PeerConnection from '../util/peerConnectionClass'
 import ChatBox from '../components/ChatBox'
-import { receiveUser } from '../storeManagers/AuthManager';
-import { addMessage, increaseMessageIdCounter, resetMessages } from '../storeManagers/MessagesManager'
+import { receiveUser } from '../StoreManagers/AuthManager';
+import { addMessage, increaseMessageIdCounter, resetMessages } from '../StoreManagers/MessagesManager'
 // yarn added @tensorflow/tfjs
 // // const mobilenet = require('@tensorflow-models/mobilenet')
 // const cocoSsd = require('@tensorflow-models/coco-ssd')
