@@ -1,6 +1,6 @@
 export default class Socket {
     constructor(setSubscribedToConversationChannel, setOtherUsersInfo, setWebSocketEstablished, socketResponseTriggeredFunc) {
-        this.socket = new WebSocket("ws://localhost:3000/cable")
+        this.socket = new WebSocket(`${process.env.REACT_APP_WS_API_URL}cable`)
         this.setSubscribedToConversationChannel = setSubscribedToConversationChannel;
         this.setOtherUsersInfo = setOtherUsersInfo;
         this.setWebSocketEstablished = setWebSocketEstablished

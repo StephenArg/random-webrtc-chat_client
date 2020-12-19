@@ -23,7 +23,7 @@ function Login(props) {
         const user = {
             email, password
         }
-        fetch('http://localhost:3000/users/login', {
+        fetch(`${process.env.REACT_APP_API_URL}users/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

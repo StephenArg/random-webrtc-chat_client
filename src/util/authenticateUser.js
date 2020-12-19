@@ -8,7 +8,7 @@ const authenticateUser = async (history) => {
 }
 
 const handlePostCall = async (obj, history) => {
-    const res = await fetch('http://localhost:3000/users/authenticate', {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}users/authenticate`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

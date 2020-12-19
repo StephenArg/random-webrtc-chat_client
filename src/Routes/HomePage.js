@@ -16,7 +16,7 @@ function HomePage(props) {
       if (!signedIn && localStorage.getItem('token')) {
         const obj = {jwt: localStorage.getItem('token')}
   
-        fetch('http://localhost:3000/users/authenticate', {
+        fetch(`${process.env.REACT_APP_API_URL}users/authenticate`, {
               method: "POST",
               headers: {
                   "Content-Type": "application/json"

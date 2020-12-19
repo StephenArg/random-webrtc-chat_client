@@ -1,6 +1,6 @@
 const requestNewConversation = async (user) => {
     const obj = {user: user}
-    const res = await fetch('http://localhost:3000/conversations/find_open_room', {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}conversations/find_open_room`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -14,7 +14,7 @@ const requestNewConversation = async (user) => {
 
 export const reopenConversation = async (conversationId, userId) => {
     const obj = {conversation_id: conversationId, user_id: userId}
-    await fetch('http://localhost:3000/conversations/reopen', {
+    await fetch(`${process.env.REACT_APP_API_URL}conversations/reopen`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -24,7 +24,7 @@ export const reopenConversation = async (conversationId, userId) => {
 }
 
 export const requestCredentials = async () => {
-    const res = await fetch('http://localhost:3000/conversations/credentials')
+    const res = await fetch(`${process.env.REACT_APP_API_URL}conversations/credentials`)
     const data = await res.json()
     console.log('credentials', data.credentials)
     if (data.credentials){

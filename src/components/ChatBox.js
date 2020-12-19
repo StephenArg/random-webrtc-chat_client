@@ -50,10 +50,10 @@ function ChatBox(props) {
         <div>
             <div className="chat-list">
                 <div className="location-messages"> Chat Messages</div>
-                <div className="location-messages"> - {user.name} (You) - Location: {myLocation}</div>
+                <div className="location-messages"> - {user.name} (You) {myLocation !== 'N/A' && <>- Location: {myLocation}</>}</div>
                 {otherUsersInfo.name !== 'N/A' ?
                 (<Fragment>
-                    <div className="location-messages"> - {otherUsersInfo.name} (Joined) - Location: {otherUsersInfo.location} </div>
+                    <div className="location-messages"> - {otherUsersInfo.name} (Joined) {otherUsersInfo.location !== 'N/A' && <>- Location: {otherUsersInfo.location}</>} </div>
                     <hr className="chat-box-hr" />
                 </Fragment>)
                 : null}

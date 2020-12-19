@@ -16,6 +16,7 @@ function App(props) {
   useEffect(() => {
     // props.setBrowserHistory(props.browserHistory)
     props.requestLocationData()
+    console.log(process.env.REACT_APP_API_URL)
   }, [])
 
   return (
