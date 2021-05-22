@@ -183,13 +183,12 @@ input[type=text]:focus, input[type=password]:focus, input[type=text]:hover, inpu
 
 .menu-container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
-    gap: 1px 1px;
-    grid-template-areas: ". . . . . . ." ". . . . . . ." ". . . . . . ." ". . . . . . ." ". . . . . . ." ". . . . . . .";
+    grid-template-rows: 0fr 0fr 0fr 0fr 1fr;
     border: #282c34;
     border-style: solid;
     border-radius: 10px;
+    width: 56%;
+    margin-left: 21%;
 }
 
 .chatroom-container {
@@ -324,6 +323,25 @@ input[type=text]:focus, input[type=password]:focus, input[type=text]:hover, inpu
   font-weight: bold;
 }
 .next-chatbox-button:hover {
+  border-color: rgb(83, 72, 177);
+}
+
+.main-menu-button {
+  border-radius: 12px;
+  width: 100%;
+  font-weight: 550;
+  font-family: arial;
+  height: 3em;
+  outline: none;
+  padding: 5px;
+  padding-left: 9px;
+  cursor: pointer;
+  font-size: 16px;
+  background-color: rgb(131, 169, 202);
+  border: 3px solid black;
+  font-weight: bold;
+}
+.main-menu-button:hover {
   border-color: rgb(83, 72, 177);
 }
 
